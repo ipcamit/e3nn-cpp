@@ -45,11 +45,25 @@ TEST(PermTest, Group) {
     EXPECT_TRUE(is_group(g));
 }
 
-TEST(PermTest, Germinate) {
+TEST(PermTest, GerminateTestGroup) {
     PermSet subset = {{0, 1, 2}, {1, 0, 2}};
+    auto g = germinate(subset);
+    EXPECT_EQ(g.size(), 2);
+    EXPECT_TRUE(is_group(g));
+}
+
+TEST(PermTest, GerminateTestIncompleteGroup) {
+    PermSet subset = {{0, 2, 1}, {1, 0, 2}};
     auto g = germinate(subset);
     EXPECT_EQ(g.size(), 6);  // Should generate full S3 group
     EXPECT_TRUE(is_group(g));
+    // {(0, 1, 2), (0, 2, 1), (1, 0, 2), (1, 2, 0), (2, 0, 1), (2, 1, 0)}
+    EXPECT_TRUE(g.find({0, 1, 2}) != g.end());
+    EXPECT_TRUE(g.find({0, 2, 1}) != g.end());
+    EXPECT_TRUE(g.find({1, 0, 2}) != g.end());
+    EXPECT_TRUE(g.find({1, 2, 0}) != g.end());
+    EXPECT_TRUE(g.find({2, 0, 1}) != g.end());
+    EXPECT_TRUE(g.find({2, 1, 0}) != g.end());
 }
 
 TEST(PermTest, ToCycles) {
@@ -62,14 +76,15 @@ TEST(PermTest, ToCycles) {
 TEST(PermTest, Sign) {
     EXPECT_EQ(sign({0, 1, 2}), 1);
     EXPECT_EQ(sign({1, 0, 2}), -1);
-    EXPECT_EQ(sign({1, 2, 3, 0}), 1);
+    EXPECT_EQ(sign({1, 2, 3, 0}), -1);
+    EXPECT_EQ(sign({0, 2, 3, 1}), 1);
 }
 
 TEST(PermTest, NaturalRepresentation) {
     Eigen::MatrixXd expected(3, 3);
-    expected << 0, 1, 0,
-                0, 0, 1,
-                1, 0, 0;
+    expected << 0, 0, 1,
+                1, 0, 0,
+                0, 1, 0;
     EXPECT_TRUE(natural_representation({1, 2, 0}).isApprox(expected));
 }
 
